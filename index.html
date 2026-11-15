@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>밴드 캐릭터 소개</title>
+<style>
+  /* 기본 배경 설정 (어두운 밴드 콘셉트) */
+  body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Malgun Gothic', sans-serif;
+    margin: 0;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+  }
+
+  /* 캐릭터 사각형 카드들을 나란히 배치하는 틀 */
+  .card-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* 개별 사각형 카드 디자인 */
+  .card {
+    background-color: #1e1e1e;
+    border: 2px solid #333;
+    border-radius: 12px;
+    width: 220px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  /* 마우스를 올렸을 때 살짝 커지는 효과 */
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: #ff3e3e; /* 포인트 색상 */
+  }
+
+  .card img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .card-name {
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  /* 클릭 시 나타나는 어두운 배경 (모달 배경) */
+  .modal-bg {
+    display: none; /* 평소에는 숨김 */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  /* 화면이 커지면서 나타나는 세부정보 사각형 창 */
+  .modal-box {
+    background: #222;
+    border: 2px solid #ff3e3e;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    padding: 25px;
+    text-align: left;
+    position: relative;
+    animation: popUp 0.25s ease-out; /* 커지는 애니메이션 */
+  }
+
+  @keyframes popUp {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-box img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+
+  .modal-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin: 0 0 5px 0;
+    color: #ff3e3e;
+  }
+
+  .modal-position {
+    font-size: 0.95rem;
+    color: #aaa;
+    margin-bottom: 15px;
+  }
+
+  .modal-desc {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #eee;
+  }
+
+  /* 닫기 버튼 (X) */
+  .close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    font-size: 1.8rem;
+    color: #fff;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+  <h1>BAND MEMBERS</h1>
+
+  <!-- 캐릭터 카드 목록 (복사해서 멤버 추가 가능) -->
+  <div class="card-grid">
+    
+    <!-- 멤버 1 -->
+    <div class="card" onclick="openModal('강해준', '보컬 / 기타', 'images/char1.jpg', '밴드의 리더이자 작곡 담당. 무대 위에서는 카리스마 넘치지만 평소에는 허당기가 있다.')">
+      <img src="https://placeholder.com" alt="강해준">
+      <div class="card-name">강해준</div>
+    </div>
+
+    <!-- 멤버 2 -->
+    <div class="card" onclick="openModal('이서연', '베이스', 'images/char2.jpg', '차분하고 현실적인 성격으로 팀의 중심을 잡아주는 베이시스트. 단 것을 매우 좋아한다.')">
+      <img src="https://placeholder.com" alt="이서연">
+      <div class="card-name">이서연</div>
+    </div>
+
+    <!-- 멤버 3 -->
+    <div class="card" onclick="openModal('박도윤', '드럼', 'images/char3.jpg', '에너지가 넘치는 팀의 분위기 메이커. 힘 있는 드러밍이 특징이다.')">
+      <img src="https://placeholder.com" alt="박도윤">
+      <div class="card-name">박도윤</div>
+    </div>
+
+  </div>
+
+  <!-- 클릭했을 때 커지는 세부정보 창 -->
+  <div class="modal-bg" id="modalBg" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <img id="modalImg" src="" alt="캐릭터 상세 이미지">
+      <h2 class="modal-title" id="modalName">이름</h2>
+      <div class="modal-position" id="modalPos">포지션</div>
+      <p class="modal-desc" id="modalDesc">상세 설명이 여기에 표시됩니다.</p>
+    </div>
+  </div>
+
+<script>
+  function openModal(name, pos, imgSrc, desc) {
+    document.getElementById('modalName').innerText = name;
+    document.getElementById('modalPos').innerText = pos;
+    // 테스트용 임시 이미지 처리 (실제 이미지 연결 시 아래 두 줄을 지우고 위 줄 주석을 푸세요)
+    document.getElementById('modalImg').src = "https://placeholder.com" + encodeURIComponent(name);
+    // document.getElementById('modalImg').src = imgSrc; 
+    
+    document.getElementById('modalDesc').innerText = desc;
+    document.getElementById('modalBg').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('modalBg').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
