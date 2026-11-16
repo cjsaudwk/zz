@@ -1,79 +1,353 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>캐릭터&프롤로그 웹툰 보기</title>
-<style>
-body { background: #f8f9fa; color: #222; font-family: 'Malgun Gothic', sans-serif; margin: 0; text-align: center; }
-header { background: #fff; border-bottom: 1px solid #ddd; padding: 25px 15px; }
-h1 { font-size: 1.5rem; margin: 0; }
-.box { max-width: 820px; margin: 0 auto; padding: 30px 15px 60px; }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 50px; }
-@media (max-width: 650px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-.card { background: #fff; border: 1px solid #ddd; border-radius: 14px; overflow: hidden; cursor: pointer; }
-.card:hover { border-color: #ff4757; }
-.card img { width: 100%; height: 240px; object-fit: cover; display: block; background: #eee; }
-.card-name { font-size: 1.1rem; font-weight: bold; padding: 12px 5px 2px; }
-.card-role { font-size: 0.85rem; color: #ff4757; padding-bottom: 12px; }
-.webtoon { max-width: 700px; margin: 0 auto; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-.webtoon img { width: 100%; display: block; }
-.modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 1000; padding: 15px; box-sizing: border-box; }
-.modal { background: #fff; border-radius: 18px; width: 100%; max-width: 400px; padding: 24px; text-align: left; position: relative; }
-.modal img { width: 100%; height: 260px; object-fit: cover; border-radius: 10px; margin-bottom: 12px; background: #eee; }
-.close { position: absolute; top: 10px; right: 16px; font-size: 1.8rem; border: none; background: none; cursor: pointer; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>거꾸로 매달린 밴드부! | 공식 캐릭터 & 세계관 소개</title>
+  <style>
+    :root {
+      --bg-color: #181715;
+      --card-bg: #23211e;
+      --text-main: #f2efe9;
+      --text-sub: #b5afa6;
+      --accent: #d9a05b;
+      --border: #38342e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* 상단 히어로 배너 (제목 거꾸로 뒤집기 효과 적용) */
+    header {
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: radial-gradient(circle at top, #2c2823 0%, var(--bg-color) 75%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .main-title {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    /* 썸네일/타이틀 180도 거꾸로 반전 연출 */
+    .upside-down {
+      display: inline-block;
+      transform: rotate(180deg);
+      color: var(--accent);
+      margin-right: 6px;
+      transition: transform 0.4s ease;
+      cursor: pointer;
+    }
+
+    .upside-down:hover {
+      transform: rotate(0deg);
+    }
+
+    .subtitle {
+      color: var(--text-sub);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      font-size: 1.05rem;
+    }
+
+    /* 오프닝 스토리 미리보기 박스 */
+    .story-box {
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 32px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .story-box h2 {
+      font-size: 1.35rem;
+      color: var(--accent);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .story-text p {
+      margin-bottom: 14px;
+      color: #e2ddd5;
+      font-size: 0.98rem;
+    }
+
+    .dialogue {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-style: italic;
+      color: #fff;
+    }
+
+    /* 캐릭터 그리드 */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px 20px 80px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 24px;
+    }
+
+    .char-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .char-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+    }
+
+    .char-img-wrap {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background-color: #1c1a17;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .char-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .img-placeholder {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      padding: 20px;
+    }
+
+    .char-info {
+      padding: 22px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .char-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .char-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .char-role {
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .char-meta {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .char-desc {
+      font-size: 0.94rem;
+      color: #dcd7ce;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .char-quote {
+      background: #1a1815;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: var(--accent);
+      border: 1px solid #2e2a24;
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>캐릭터&프롤로그 웹툰 보기</h1>
-</header>
+  <header>
+    <div class="badge">폐부 직전 5인조 괴짜 밴드</div>
+    <h1 class="main-title">
+      <span class="upside-down" title="마우스를 올리면 돌아옵니다!">거꾸로</span> 매달린 밴드부!
+    </h1>
+    <p class="subtitle">
+      다음 달 문화제 무대에서 전교생을 만족시키지 못하면 즉시 폐부?!<br />
+      나사 하나씩 빠진 5명의 천재 부원들과 함께하는 좌충우돌 청춘 밴드 스토리
+    </p>
+  </header>
 
-<div class="box">
-  <div class="grid">
-    <div class="card" onclick="openM(0)"><img src="char1.png" alt="한소연"><div class="card-name">한소연</div><div class="card-role">고문 / 여선생님</div></div>
-    <div class="card" onclick="openM(1)"><img src="char2.png" alt="채은별"><div class="card-name">채은별</div><div class="card-role">보컬 · 고3</div></div>
-    <div class="card" onclick="openM(2)"><img src="char3.png" alt="백하루"><div class="card-name">백하루</div><div class="card-role">리드 기타 · 고2</div></div>
-    <div class="card" onclick="openM(3)"><img src="char6.png" alt="주아나"><div class="card-name">주아나</div><div class="card-role">키보드 · 고1</div></div>
-    <div class="card" onclick="openM(4)"><img src="char4.png" alt="신솔라"><div class="card-name">신솔라</div><div class="card-role">베이스 · 고1</div></div>
-    <div class="card" onclick="openM(5)"><img src="char5.png" alt="송예림"><div class="card-name">송예림</div><div class="card-role">드럼 · 고1</div></div>
-  </div>
+  <main class="container">
+    <!-- 1화 오프닝 상황극 -->
+    <section class="story-box">
+      <h2>🎬 EP.01 — 구관 3층 끝방의 충격적인 첫 만남</h2>
+      <div class="story-text">
+        <p>교내 동아리 정원이 전부 꽉 차 갈 곳을 잃은 당신은, 만사 귀찮아하는 담임 교사 <strong>한소연</strong>의 추천으로 폐부 직전의 구관 밴드부실에 배정된다.</p>
+        <div class="dialogue">
+          "하아... 다른 동아리는 전부 정원 초과야. 딱 하나, 인원 미달로 폐부 직전인 곳이 있긴 한데... 구관 3층 끝방, 밴드부. 거기 애들 좀 특이하긴 해도 나쁜 애들은 아니니까, 거기라도 갈래?"
+        </div>
+        <p>담임 선생님의 서류를 받아 들고 도착한 구관 3층 끝 나무 미닫이문 앞. 등 뒤에서 백발의 실눈 리더 <strong>시라유키</strong>가 천사처럼 웃으며 문을 활짝 열어젖혔다.</p>
+        <p>그리고 눈앞에 펼쳐진 광경에 당신은 얼어붙고 말았다. 방 건너편 벽면 높은 곳에 파란 단발의 미소년 <strong>루이</strong>가 은색 덕트 테이프에 X자로 둘둘 감겨 대롱대롱 매달려 있었기 때문이다.</p>
+        <div class="dialogue">
+          "으으읍! 선배, 살려줘! 이 악마 누나가 날 벽에 붙였어!!"
+        </div>
+      </div>
+    </section>
 
-  <div class="webtoon">
-    <img src="1.png"><img src="2.png"><img src="3.png"><img src="4.png"><img src="5.png">
-    <img src="6.png"><img src="7.png"><img src="8.png"><img src="9.png"><img src="10.png">
-    <img src="11.png"><img src="12.png"><img src="13.png">
-  </div>
-</div>
+    <!-- 캐릭터 소개 카드 그리드 -->
+    <h2 class="section-title">🎸 등장인물 소개</h2>
+    <div class="char-grid" id="charGrid"></div>
+  </main>
 
-<div class="modal-bg" id="mBg" onclick="closeM()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <button class="close" onclick="closeM()">&times;</button>
-    <img id="mImg" src="">
-    <h2 id="mName" style="margin:0 0 5px;color:#222"></h2>
-    <div id="mPos" style="color:#ff4757;font-weight:bold;margin-bottom:10px"></div>
-    <p id="mDesc" style="line-height:1.6;color:#444;margin:0"></p>
-  </div>
-</div>
+  <footer>
+    © Upside-Down Band Club Project. Hosted on GitHub Pages.
+  </footer>
 
-<script>
-const chars = [
-  ["한소연 (29세)", "고문 · 나른한 여선생님 · 돈미새", "char1.png", "항상 나른하고 피곤해 보이는 퇴폐미 넘치는 29살 여선생님. 귀찮은 일을 극도로 싫어하지만 돈이 걸린 일이라면 눈빛부터 달라지는 철저한 돈미새다."],
-  ["채은별 (19세)", "보컬 · 고등학생 3학년 · 밴드부 부장 · 반전 미녀", "char2.png", "누구에게나 상냥하게 웃어주는 완벽한 미녀 부장이지만, 한 번 화가 나면 멤버 전원이 얼어붙을 정도로 무섭게 돌변하는 반전 미녀다."],
-  ["백하루 (18세)", "리드 기타 · 고등학생 2학년 · 밴드부 차장 · 여장남자 · 메스카기", "char3.png", "귀여운 여장남자 외모와 달리 입만 열면 약 올리는 건방진 성격의 메스카기 차장. 밴드 연습 때는 걸핏하면 도망치고 부장 채은별에게 장난을 자주 쳐서 매일같이 혼나지만, 리드 기타 실력만큼은 천재적이다."],
-  ["주아나 (18세)", "키보드 · 고등학생 1학년 · SNS중독 갸루", "char6.png", "화려한 스타일링과 SNS 인증샷에 진심인 인싸 갸루 키보디스트. 텐션이 높고 밴드의 온라인 홍보도 도맡아 한다."],
-  ["신솔라 (17세)", "베이스 · 고등학생 1학년 · 자칭 돈키호테", "char4.png", "언제나 기사 복장을 입고 스스로를 정의의 돈키호테라 부르는 엉뚱한 베이시스트. 진지한 말투와 달리 허당미가 넘친다."],
-  ["송예림 (17세)", "드럼 · 고등학생 1학년 · 대인기피증 봉투녀", "char5.png", "사람과 눈을 마주치기 힘들어해 봉투를 쓰고 다니는 소심한 대인기피증 소녀지만, 드럼 스틱을 잡으면 폭발적인 비트를 뿜어낸다."]
-];
-function openM(i) {
-  document.getElementById('mName').innerText = chars[i][0];
-  document.getElementById('mPos').innerText = chars[i][1];
-  document.getElementById('mImg').src = chars[i][2];
-  document.getElementById('mDesc').innerText = chars[i][3];
-  document.getElementById('mBg').style.display = 'flex';
-}
-function closeM() { document.getElementById('mBg').style.display = 'none'; }
-</script>
+  <script>
+    const characters = [
+      {
+        id: "shirayuki",
+        name: "시라유키",
+        role: "보컬 / 밴드부 리더",
+        meta: "17세 (고2) · 백발 긴머리 · 실눈 흑막",
+        img: "assets/shirayuki/default.png",
+        desc: "겉으로는 온화하고 예의 바른 우등생 리더지만, 실질적으로 부원들을 물리력(?)으로 통제하는 무투파 흑막. 부원들이 선을 넘으면 상냥한 실눈 미소 그대로 벽에 테이프로 붙여버린다.",
+        quote: "“자꾸 말썽을 피우면... 오늘도 벽에 조금 매달려 있어야겠네요?”"
+      },
+      {
+        id: "shinsola",
+        name: "신솔라",
+        role: "리드 기타 / 중2병 기사",
+        meta: "17세 (고2) · 에메랄드 긴머리 · 은색 갑옷 & 망토",
+        img: "assets/shinsola/default.png",
+        desc: "스스로를 이세계에서 환생한 방랑 기사라고 믿는 열혈 괴짜. 햇빛만 보면 가끔씩 양팔을 V자로 뻗고 우렁차게 '태양 만세!!!'를 외치거나 회피 구르기를 시전한다.",
+        quote: "“크하핫! 눈부신 햇살이여! 태양 만세!!!”"
+      },
+      {
+        id: "rui",
+        name: "루이",
+        role: "베이스 / 메스가키 보추",
+        meta: "16세 (고1) · 파란 단발 · 오토코노코",
+        img: "assets/rui/default.png",
+        desc: "선배들을 놀려먹고 깐죽거리는 소악마 메스가키 후배. 입만 열면 '허접~'이라며 도발하지만, 역공이나 칭찬을 받으면 얼굴이 새빨개져 고장 나는 유리멘탈 츤데레.",
+        quote: "“에~ 신입 선배, 우리 부실 보고 쫄았어? 완전 허접이네~”"
+      },
+      {
+        id: "momo",
+        name: "모모",
+        role: "드럼 / 종이봉투 소심녀",
+        meta: "16세 (고1) · 핑크 단발 · 구멍 뚫린 종이봉투",
+        img: "assets/momo/default.png",
+        desc: "극도의 대인공포증과 소심함을 가진 낯가림쟁이. 평소에는 종이봉투를 뒤집어쓰고 구석에서 덜덜 떨지만, 드럼 스틱만 잡으면 부실이 떠나갈 듯한 폭풍 연주를 선보인다.",
+        quote: "“히익... 쳐, 쳐다보지 마세요... 드럼 칠 때만큼은 무섭지 않아요...!”"
+      },
+      {
+        id: "juana",
+        name: "주아나",
+        role: "키보드 / SNS 중독 다이아 수저",
+        meta: "17세 (고2) · 밀크티 브라운 반묶음 · 빨간 실핀 2개",
+        img: "assets/juana/default.png",
+        desc: "24시간 틱톡과 릴스에 사는 초긍정 갸루. 덜렁대서 밴드 장비와 자기 핸드폰을 자주 깨뜨리지만, 엄청난 다이아 수저 금수저라 사비로 최고급 신제품을 바로 사서 복구한다.",
+        quote: "“어머, 방금 앰프 또 터뜨렸네? 괜찮아, 내 카드로 최신형 최고급 모델 오늘 바로 시켜놓을게~”"
+      },
+      {
+        id: "hansoyeon",
+        name: "한소연",
+        role: "{{user}}의 담임 교사",
+        meta: "20대 후반 · 검은 긴 생머리 · 반쯤 감긴 남색 눈",
+        img: "assets/hansoyeon/default.png",
+        desc: "겉으로는 만사 귀찮아하고 돈 냄새를 밝히는 게으른 속물 교사처럼 굴지만, 사실 은근히 학생들을 생각하며 문제아 취급받는 밴드부 애들을 그나마 가장 잘 대해주는 든든한 담임 선생님.",
+        quote: "“다른 선생들이 뭐라든 신경 쓰지 마. 너희들 무대, 나름 기대하고 있으니까.”"
+      }
+    ];
+
+    const grid = document.getElementById("charGrid");
+
+    characters.forEach(char => {
+      const card = document.createElement("article");
+      card.className = "char-card";
+      card.innerHTML = `
+        <div class="char-img-wrap">
+          <img src="${char.img}" alt="${char.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+          <div class="img-placeholder" style="display:none;">
+            <strong>${char.name}</strong><br />
+            <span>(${char.img} 경로에 이미지를 넣어주세요)</span>
+          </div>
+        </div>
+        <div class="char-info">
+          <div class="char-header">
+            <h3 class="char-name">${char.name}</h3>
+            <span class="char-role">${char.role}</span>
+          </div>
+          <div class="char-meta">${char.meta}</div>
+          <p class="char-desc">${char.desc}</p>
+          <div class="char-quote">${char.quote}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
 </body>
 </html>
